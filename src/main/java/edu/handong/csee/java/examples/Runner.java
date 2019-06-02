@@ -1,17 +1,21 @@
 package edu.handong.csee.java.examples;
 
-import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLine; 
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
+import java.io.File;
+import java.io.IOException;
+
 public class Runner {
 	
 	String path;
 	boolean verbose;
 	boolean help;
+	boolean fullpath;
 
 	public static void main(String[] args) {
 
@@ -33,10 +37,26 @@ public class Runner {
 			System.out.println("You provided \"" + path + "\" as the value of the option p");
 			
 			// TODO show the number of files in the path
+			File folder = new File(path);
+			File[] listOfFiles = folder.listFiles();
+			
+			System.out.println("number of files : " + listOfFiles.length);
 			
 			if(verbose) {
 				
 				// TODO list all files in the path
+				
+
+				for (int i = 0; i < listOfFiles.length; i++) {
+					if (fullpath)
+						try {
+							System.out.println(listOfFiles[i].getCanonicalPath());
+						} catch (IOException e) {
+							System.out.println(e.getMessage());
+						}
+					else 
+						System.out.println(listOfFiles[i].getPath());
+				}
 				
 				System.out.println("Your program is terminated. (This message is shown because you turned on -v option!");
 			}
@@ -53,6 +73,7 @@ public class Runner {
 			path = cmd.getOptionValue("p");
 			verbose = cmd.hasOption("v");
 			help = cmd.hasOption("h");
+			fullpath = cmd.hasOption("f");
 
 		} catch (Exception e) {
 			printHelp(options);
@@ -72,6 +93,11 @@ public class Runner {
 				.hasArg()
 				.argName("Path name to display")
 				.required()
+				.build());
+		
+		options.addOption(Option.builder("f").longOpt("fullpath")
+				.desc("print out full path of the files in the directory")
+				.argName("fullpath option")
 				.build());
 
 		// add options by using OptionBuilder
